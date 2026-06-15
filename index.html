@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Media Stats FULL HD - Ultimate Edition</title>
-<link rel="manifest" href="manifest.json">
+    <title>Templates - Anime & Manga</title>
+    <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#683d9c">
     <link rel="apple-touch-icon" href="icon.png">
     <script>
@@ -118,7 +118,6 @@
             position: relative; background-color: var(--card-bg-color); border-radius: 20px;
             overflow: hidden; box-shadow: 0 40px 80px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.1);
             aspect-ratio: 16 / 9; width: 100%; 
-            /* Variable CSS Dinámica para todo el componente */
             --score-color: #683d9c; 
         }
 
@@ -126,7 +125,6 @@
         .card-bg-blur { position: absolute; inset: -10%; background-size: cover; background-position: center; filter: blur(25px); opacity: 0.5; }
         .card-bg-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11,11,14,0.85) 0%, rgba(11,11,14,1) 100%); }
         
-        /* Efecto de Luz Ambiental dinámica */
         .ambient-glow {
             position: absolute; right: -10%; bottom: -20%; width: 50%; aspect-ratio: 1;
             border-radius: 50%; background: var(--score-color); filter: blur(120px); opacity: 0.2; z-index: 1;
@@ -137,8 +135,7 @@
         
         .color-line {
             position: absolute; bottom: 0; left: 0; right: 0; height: 3px; z-index: 4;
-            background-color: var(--score-color);
-            box-shadow: 0 -2px 15px var(--score-color); 
+            background-color: var(--score-color); box-shadow: 0 -2px 15px var(--score-color); 
         }
 
         .card-content {
@@ -148,41 +145,45 @@
 
         .info-layout { display: flex; flex-direction: column; gap: 15px; width: 75%; }
 
+        /* TAMAÑOS REDUCIDOS PARA EVITAR SOLAPAMIENTOS EN PREVIEW */
         .title-val {
-            font-size: 2.8rem; font-weight: 900; color: #ffffff; line-height: 1.1;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 95%;
-            letter-spacing: -1px; text-shadow: 2px 2px 10px rgba(0,0,0,0.9); margin-bottom: 5px;
+            font-size: 2.2rem; font-weight: 900; color: #ffffff; line-height: 1.1;
+            /* Flexibilidad dinámica */
+            display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;
+            max-width: 95%; letter-spacing: -0.5px; text-shadow: 2px 2px 10px rgba(0,0,0,0.9); margin-bottom: 5px;
         }
 
-        .stats-grid { display: grid; grid-template-columns: 1fr 1.2fr 1.5fr; gap: 18px 30px; transition: all 0.3s; }
-        .col-group { display: flex; flex-direction: column; gap: 18px; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1.2fr 1.5fr; gap: 15px 25px; transition: all 0.3s; }
+        .col-group { display: flex; flex-direction: column; gap: 15px; }
         
-        .stat-item { display: flex; flex-direction: column; gap: 6px; }
+        .stat-item { display: flex; flex-direction: column; gap: 4px; }
         
-        /* Acentos Dinámicos (Led) en las etiquetas */
-        .stat-label { font-size: 0.75rem; color: #8b8b99; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; line-height: 1; }
+        .stat-label { font-size: 0.65rem; color: #8b8b99; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; line-height: 1; }
         .stat-label::before {
-            content: ''; display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+            content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%;
             background-color: var(--score-color); margin-right: 8px; vertical-align: middle;
-            box-shadow: 0 0 8px var(--score-color); transform: translateY(-2px);
+            box-shadow: 0 0 8px var(--score-color); transform: translateY(-1px);
         }
 
-        .stat-value { font-size: 1.35rem; color: #f8f8f8; font-weight: 600; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 250px; }
+        .stat-value { 
+            font-size: 1.15rem; color: #f8f8f8; font-weight: 600; line-height: 1.1; 
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; 
+        }
 
         .season-badge {
             display: inline-flex; align-items: center; justify-content: center;
-            padding: 6px 14px; border-radius: 8px; font-weight: 800; font-size: 1rem;
+            padding: 5px 12px; border-radius: 8px; font-weight: 800; font-size: 0.85rem;
             letter-spacing: 1px; line-height: 1.2; width: fit-content;
         }
 
-        .char-item { display: flex; flex-direction: column; gap: 12px; justify-content: flex-start; }
-        .char-content { display: flex; align-items: center; gap: 15px; }
+        .char-item { display: flex; flex-direction: column; gap: 10px; justify-content: flex-start; }
+        .char-content { display: flex; align-items: center; gap: 12px; }
         .char-avatar {
-            width: 75px; height: 75px; border-radius: 50%; background-color: #222; flex-shrink: 0;
+            width: 60px; height: 60px; border-radius: 50%; background-color: #222; flex-shrink: 0;
             background-size: cover; background-position: center; border: 3px solid var(--score-color);
             box-shadow: 0 0 15px var(--score-color);
         }
-        .char-name { font-size: 1.3rem; font-weight: 700; color: #fff; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px; }
+        .char-name { font-size: 1.15rem; font-weight: 700; color: #fff; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px; }
 
         .score-wrapper {
             position: relative; width: 20%; aspect-ratio: 1/1; display: flex; justify-content: center; align-items: center;
@@ -195,18 +196,17 @@
             -webkit-mask: radial-gradient(closest-side, transparent 86%, black 88%);
             mask: radial-gradient(closest-side, transparent 86%, black 88%);
         }
-        .score-text { position: relative; font-size: 3.8rem; font-weight: 900; color: #ffffff; line-height: 1; z-index: 10; text-shadow: 0 0 20px var(--score-color), 2px 2px 5px rgba(0,0,0,0.9); }
+        .score-text { position: relative; font-size: 3.5rem; font-weight: 900; color: #ffffff; line-height: 1; z-index: 10; text-shadow: 0 0 20px var(--score-color), 2px 2px 5px rgba(0,0,0,0.9); }
 
-        /* Icono Dinámico */
         .media-icon {
-            position: absolute; bottom: 25px; left: 55px; width: 28px; height: 28px;
+            position: absolute; bottom: 25px; left: 55px; width: 25px; height: 25px;
             color: var(--score-color); filter: drop-shadow(0 0 10px var(--score-color)); z-index: 5;
         }
         .media-icon svg { width: 100%; height: 100%; fill: currentColor; }
 
         .watermark {
             position: absolute; bottom: 15px; left: 0; right: 0; text-align: center;
-            font-size: 0.75rem; color: rgba(255,255,255,0.3); font-weight: 500; letter-spacing: 1px; z-index: 5;
+            font-size: 0.7rem; color: rgba(255,255,255,0.3); font-weight: 500; letter-spacing: 1px; z-index: 5;
         }
 
         #loadingOverlay {
@@ -254,28 +254,28 @@
 
             <div class="form-group">
                 <span class="input-label">Título de la Obra</span>
-                <input type="text" id="inputTitle" value="Sousou no Frieren" oninput="updatePreview()">
+                <input type="text" id="inputTitle" value="Seishun Buta Yarou wa Santa Claus no Yume wo Minai" oninput="updatePreview()">
             </div>
             
             <div class="form-row">
                 <div class="form-group" style="flex: 1;">
                     <span class="input-label" id="labelEpisodes">Episodios</span>
-                    <input type="text" id="inputEpisodes" value="28" oninput="updatePreview()">
+                    <input type="text" id="inputEpisodes" value="13" oninput="updatePreview()">
                 </div>
                 <div class="form-group" style="flex: 1;">
                     <span class="input-label">Nota (1-10)</span>
-                    <input type="number" id="inputScore" value="9" min="1" max="10" step="0.1" oninput="updatePreview()">
+                    <input type="number" id="inputScore" value="8" min="1" max="10" step="0.1" oninput="updatePreview()">
                 </div>
             </div>
 
             <div class="form-row">
                 <div class="form-group" style="flex: 1;">
                     <span class="input-label" id="labelStudio">Estudio</span>
-                    <input type="text" id="inputStudio" value="Madhouse" oninput="updatePreview()">
+                    <input type="text" id="inputStudio" value="CloverWorks" oninput="updatePreview()">
                 </div>
                 <div class="form-group" style="flex: 1;" id="charGroup">
                     <span class="input-label">Fav Character</span>
-                    <input type="text" id="inputCharacter" value="Stark" oninput="updatePreview()">
+                    <input type="text" id="inputCharacter" value="Mai Sakurajima" oninput="updatePreview()">
                 </div>
             </div>
             
@@ -290,20 +290,20 @@
                             <option value="SUMMER">Summer</option>
                             <option value="FALL" selected>Fall</option>
                         </select>
-                        <input type="number" id="inputYear" value="2023" style="width: 80px;" oninput="updatePreview()">
+                        <input type="number" id="inputYear" value="2025" style="width: 80px;" oninput="updatePreview()">
                     </div>
                     
-                    <input type="text" id="inputArt" value="Tsukasa Abe" style="display: none;" oninput="updatePreview()">
+                    <input type="text" id="inputArt" value="" style="display: none;" oninput="updatePreview()">
                 </div>
             </div>
 
             <div class="form-group">
                 <span class="input-label" id="labelWatched">Fechas completado</span>
-                <input type="text" id="inputWatched" value="10/10/23 - 22/03/24" oninput="updatePreview()">
+                <input type="text" id="inputWatched" value="20/05/26 - 15/06/26" oninput="updatePreview()">
             </div>
 
             <button class="btn btn-export" id="btnExport" onclick="exportToPng()">
-                🚀 Exportar Tarjeta (1080p)
+                🚀 Exportar Tarjeta HD
             </button>
         </div>
 
@@ -322,28 +322,28 @@
                 
                 <div class="card-content">
                     <div class="info-layout">
-                        <span class="title-val preview-title">Sousou no Frieren</span>
+                        <span class="title-val preview-title">Seishun Buta Yarou wa Santa Claus no Yume wo Minai</span>
                         <div class="stats-grid" id="statsGrid">
                             
                             <div class="col-group">
                                 <div class="stat-item">
                                     <span class="stat-label" id="outLabelEpisodes">EPISODES</span>
-                                    <span class="stat-value preview-episodes">28</span>
+                                    <span class="stat-value preview-episodes">13</span>
                                 </div>
                                 <div class="stat-item">
                                     <span class="stat-label" id="outLabelSeason">SEASON</span>
-                                    <span class="season-badge preview-season" id="outSeasonVal">FALL 2023</span>
+                                    <span class="season-badge preview-season" id="outSeasonVal">SUMMER 2025</span>
                                 </div>
                             </div>
 
                             <div class="col-group">
                                 <div class="stat-item">
                                     <span class="stat-label" id="outLabelStudio">STUDIO</span>
-                                    <span class="stat-value preview-studio">Madhouse</span>
+                                    <span class="stat-value preview-studio">CloverWorks</span>
                                 </div>
                                 <div class="stat-item">
                                     <span class="stat-label" id="outLabelWatched">WATCHED</span>
-                                    <span class="stat-value preview-watched">10/10/23 - 22/03/24</span>
+                                    <span class="stat-value preview-watched">20/05/26 - 15/06/26</span>
                                 </div>
                             </div>
 
@@ -352,7 +352,7 @@
                                     <span class="stat-label">FAV CHARACTER</span>
                                     <div class="char-content">
                                         <div class="char-avatar" id="previewAvatar"></div>
-                                        <span class="char-name preview-char-name">Stark</span>
+                                        <span class="char-name preview-char-name">Mai Sakurajima</span>
                                     </div>
                                 </div>
                             </div>
@@ -362,13 +362,11 @@
                     <div class="score-wrapper">
                         <div class="ring-track" id="ringTrack"></div>
                         <div class="static-ring" id="staticRing"></div>
-                        <div class="score-text" id="outScore">9</div>
+                        <div class="score-text" id="outScore">8</div>
                     </div>
                 </div>
 
-                <!-- Icono TV / Book -->
                 <div class="media-icon" id="mediaIcon"></div>
-                
                 <div class="watermark">Template and tool made by @Franchowo</div>
             </div>
         </div>
@@ -437,7 +435,6 @@
                 outLabelSeason.innerText = 'SEASON'; outLabelWatched.innerText = 'WATCHED';
                 
                 statsGrid.style.gridTemplateColumns = '1fr 1.2fr 1.5fr'; 
-                document.querySelector('.type-toggle label:has(input:checked)').style.background = '#683d9c';
             } else {
                 charGroup.style.display = 'none'; charBtn.style.display = 'none';
                 outCharGroup.style.display = 'none'; animeSeasonInputs.style.display = 'none';
@@ -450,7 +447,6 @@
                 outLabelSeason.innerText = 'ART'; outLabelWatched.innerText = 'READ';
                 
                 statsGrid.style.gridTemplateColumns = '1fr 1fr'; 
-                document.querySelector('.type-toggle label:has(input:checked)').style.background = '#4cbeb9';
             }
 
             document.getElementById('mediaIcon').innerHTML = `<svg viewBox="0 0 24 24"><path d="${iconPaths[currentMode]}"></path></svg>`;
@@ -537,7 +533,6 @@
             }
 
             const colors = scoreColors[score];
-            // Inyectar Color Theme a todo el componente para los brillos ambientales y de iconos
             document.getElementById('previewCard').style.setProperty('--score-color', colors.hex);
 
             document.getElementById('ringTrack').style.borderColor = colors.rgba;
@@ -557,6 +552,20 @@
         /* =========================================================
            🚀 NATIVE CANVAS ENGINE - 1920x1080 FULL HD
            ========================================================= */
+        
+        // Función de dibujado de texto inteligente para Canvas
+        function drawScaledText(ctx, text, x, y, maxW, baseSize, weight, color) {
+            let size = baseSize;
+            ctx.font = `${weight} ${size}px Outfit, sans-serif`;
+            // Reduce el tamaño hasta que encaje en el ancho máximo
+            while(ctx.measureText(text).width > maxW && size > 20) {
+                size -= 1;
+                ctx.font = `${weight} ${size}px Outfit, sans-serif`;
+            }
+            ctx.fillStyle = color;
+            ctx.fillText(text, x, y);
+        }
+
         async function exportToPng() {
             const btn = document.getElementById('btnExport');
             const loading = document.getElementById('loadingOverlay');
@@ -580,14 +589,13 @@
             canvas.width = finalWidth; canvas.height = finalHeight;
             const ctx = canvas.getContext('2d');
 
-            // Función Helper para dibujar Etiquetas con Acento LED
             function drawLabel(text, x, y) {
                 ctx.fillStyle = colors.hex;
                 ctx.shadowColor = colors.hex; ctx.shadowBlur = 12;
-                ctx.beginPath(); ctx.arc(x - 22, y + 15, 6, 0, Math.PI * 2); ctx.fill(); // Punto LED
+                ctx.beginPath(); ctx.arc(x - 22, y + 15, 6, 0, Math.PI * 2); ctx.fill(); 
                 ctx.shadowColor = "transparent"; ctx.shadowBlur = 0;
                 ctx.fillStyle = '#8b8b99';
-                ctx.fillText(text, x, y); // Texto etiqueta
+                ctx.fillText(text, x, y); 
             }
 
             // 1. BORDES REDONDEADOS GLOBALES
@@ -615,16 +623,15 @@
             bgGradient.addColorStop(1, "rgba(11,11,14,1)");
             ctx.fillStyle = bgGradient; ctx.fillRect(0, 0, finalWidth, finalHeight);
 
-            // Luz Ambiental Radial (Ambient Glow)
+            // Luz Ambiental Radial
             const circleRadius = 150; 
             const circleCenterX = finalWidth - 120 - circleRadius; 
             const circleCenterY = 500 + ((finalHeight - 500) / 2);
             
             const glowGradient = ctx.createRadialGradient(circleCenterX, circleCenterY, 0, circleCenterX, circleCenterY, 700);
-            glowGradient.addColorStop(0, colors.hex + "30"); // 18% opacidad aproximada
+            glowGradient.addColorStop(0, colors.hex + "30"); 
             glowGradient.addColorStop(1, "transparent");
-            ctx.fillStyle = glowGradient;
-            ctx.fillRect(0, 0, finalWidth, finalHeight);
+            ctx.fillStyle = glowGradient; ctx.fillRect(0, 0, finalWidth, finalHeight);
 
             // 3. CABECERA NÍTIDA
             const headerHeight = 500;
@@ -640,37 +647,45 @@
             ctx.fillRect(0, headerHeight - 4, finalWidth, 4); 
             ctx.shadowColor = "transparent"; ctx.shadowBlur = 0;
 
-            // 4. TEXTOS HD Y GRID
-            const paddingX = 140; // Incrementado ligeramente para los LEDS
+            // 4. TEXTOS HD Y GRID ESTRICTO
+            const paddingX = 140; 
             const startY = headerHeight + 70;
             
-            ctx.font = '900 96px Outfit, sans-serif'; ctx.fillStyle = '#ffffff';
+            // Título Auto-escalable
+            let titleFontSize = 96;
+            ctx.font = `900 ${titleFontSize}px Outfit, sans-serif`;
+            // Reduce hasta encajar en un ancho seguro
+            while(ctx.measureText(title).width > 1250 && titleFontSize > 40) {
+                titleFontSize -= 2;
+                ctx.font = `900 ${titleFontSize}px Outfit, sans-serif`;
+            }
+            ctx.fillStyle = '#ffffff';
             ctx.shadowColor = "rgba(0,0,0,0.9)"; ctx.shadowBlur = 15; ctx.shadowOffsetX = 3; ctx.shadowOffsetY = 3;
             ctx.textAlign = "left"; ctx.textBaseline = "top"; 
-            ctx.fillText(title, paddingX - 25, startY, 1300); // Alineado con el título
+            ctx.fillText(title, paddingX - 25, startY); 
             ctx.shadowColor = "transparent"; ctx.shadowBlur = 0; ctx.shadowOffsetX = 0; ctx.shadowOffsetY = 0;
 
             const gridY = startY + 135; 
-            const col2X = currentMode === 'anime' ? 570 : 770; 
-            const col3X = 1050; 
+            const col2X = currentMode === 'anime' ? 540 : 770; 
+            const col3X = 960; 
             const row2Y = gridY + 135; 
 
             // -- Fila 1 --
-            ctx.font = '800 26px Outfit, sans-serif';
+            ctx.font = '800 22px Outfit, sans-serif'; // Reducido para mejor balance
             drawLabel(currentMode === 'anime' ? "EPISODES" : "CHAPTERS", paddingX, gridY);
             drawLabel(currentMode === 'anime' ? "STUDIO" : "STORY", col2X, gridY);
             if (currentMode === 'anime') drawLabel("FAV CHARACTER", col3X, gridY); 
 
-            ctx.font = '600 48px Outfit, sans-serif'; ctx.fillStyle = '#f8f8f8';
-            ctx.fillText(episodes, paddingX, gridY + 45, 380); 
-            ctx.fillText(studio, col2X, gridY + 45, currentMode === 'anime' ? 450 : 700); 
+            // Valores con Auto-Escalado
+            drawScaledText(ctx, episodes, paddingX, gridY + 40, 360, 40, '600', '#f8f8f8');
+            drawScaledText(ctx, studio, col2X, gridY + 40, 380, 40, '600', '#f8f8f8');
 
             // -- Personaje Fav (Solo Anime) --
             if (currentMode === 'anime') {
                 const character = document.getElementById('inputCharacter').value;
-                const avatarRadius = 55;
+                const avatarRadius = 45; // Reducido para más elegancia
                 const avatarX = col3X + avatarRadius - 10;
-                const avatarY = gridY + 95; 
+                const avatarY = gridY + 75; 
 
                 if (croppedCharObj.src) {
                     ctx.save();
@@ -689,19 +704,15 @@
                 ctx.beginPath(); ctx.arc(avatarX, avatarY, avatarRadius + 3, 0, Math.PI * 2);
                 ctx.lineWidth = 2; ctx.strokeStyle = "rgba(0,0,0,0.5)"; ctx.stroke();
 
-                ctx.font = '700 46px Outfit, sans-serif'; ctx.fillStyle = '#ffffff';
-                ctx.textBaseline = "middle";
-                ctx.fillText(character, avatarX + avatarRadius + 25, avatarY, 320); 
-                ctx.textBaseline = "top"; 
+                drawScaledText(ctx, character, avatarX + avatarRadius + 20, avatarY - 20, 300, 38, '700', '#ffffff');
             }
 
             // -- Fila 2 --
-            ctx.font = '800 26px Outfit, sans-serif';
+            ctx.font = '800 22px Outfit, sans-serif';
             drawLabel(currentMode === 'anime' ? "SEASON" : "ART", paddingX, row2Y);
             drawLabel(currentMode === 'anime' ? "WATCHED" : "READ", col2X, row2Y);
 
-            ctx.font = '600 48px Outfit, sans-serif'; ctx.fillStyle = '#f8f8f8';
-            ctx.fillText(watched, col2X, row2Y + 45, 450);
+            drawScaledText(ctx, watched, col2X, row2Y + 40, 400, 40, '600', '#f8f8f8');
 
             if (currentMode === 'anime') {
                 const season = document.getElementById('inputSeason').value;
@@ -709,10 +720,10 @@
                 const sColor = seasonColors[season];
                 const seasonText = `${season} ${year}`;
                 
-                ctx.font = '800 36px Outfit, sans-serif';
-                const badgeWidth = ctx.measureText(seasonText).width + 50; 
-                const badgeHeight = 60;
-                const badgeY = row2Y + 35;
+                ctx.font = '800 30px Outfit, sans-serif';
+                const badgeWidth = ctx.measureText(seasonText).width + 40; 
+                const badgeHeight = 50;
+                const badgeY = row2Y + 28;
                 
                 ctx.globalAlpha = 0.15; ctx.fillStyle = sColor;
                 ctx.beginPath(); ctx.roundRect(paddingX, badgeY, badgeWidth, badgeHeight, 14); ctx.fill();
@@ -722,12 +733,11 @@
                 ctx.beginPath(); ctx.roundRect(paddingX, badgeY, badgeWidth, badgeHeight, 14); ctx.stroke();
                 
                 ctx.fillStyle = sColor; ctx.textBaseline = "middle";
-                ctx.fillText(seasonText, paddingX + 25, badgeY + (badgeHeight/2) + 3);
+                ctx.fillText(seasonText, paddingX + 20, badgeY + (badgeHeight/2) + 3);
                 ctx.textBaseline = "top";
             } else {
                 const art = document.getElementById('inputArt').value;
-                ctx.font = '600 48px Outfit, sans-serif'; ctx.fillStyle = '#f8f8f8';
-                ctx.fillText(art, paddingX, row2Y + 45, 450);
+                drawScaledText(ctx, art, paddingX, row2Y + 40, 360, 40, '600', '#f8f8f8');
             }
 
             // 5. CÍRCULO PUNTUACIÓN
