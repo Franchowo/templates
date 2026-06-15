@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Stats FULL HD - Ultimate Edition</title>
+<link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#683d9c">
+    <link rel="apple-touch-icon" href="icon.png">
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('sw.js');
+        });
+      }
+    </script>
+    
+    <!-- Tipografía Premium -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Librería de Recorte -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
+    <style>
+        :root {
+            --bg-dark: #050505;
+            --panel-bg: #121214;
+            --input-bg: #1a1a1e;
+            --primary: #683d9c;
+            --text-main: #ffffff;
+            --text-muted: #8b8b99;
+            --border-radius: 12px;
+            --card-bg-color: #0b0b0e;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Outfit', sans-serif; background-color: var(--bg-dark);
+            color: var(--text-main); min-height: 100vh; display: flex;
+            justify-content: center; align-items: center; padding: 40px 20px;
+        }
+
+        .app-layout {
+            display: flex; gap: 40px; max-width: 1550px; width: 100%;
+            flex-wrap: wrap; justify-content: center; align-items: flex-start;
+        }
+
+        /* === PANEL DE CONTROLES === */
+        .controls-panel {
+            background: var(--panel-bg); padding: 35px 30px; border-radius: var(--border-radius);
+            width: 100%; max-width: 400px; box-shadow: 0 0 0 1px rgba(255,255,255,0.05), 0 30px 60px rgba(0,0,0,0.5);
+            z-index: 10;
+        }
+
+        .controls-panel h2 {
+            font-size: 1.5rem; margin-bottom: 20px; font-weight: 900;
+            text-transform: uppercase; letter-spacing: 1px; text-align: center;
+            background: linear-gradient(90deg, #fff, #a1a1aa); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        /* Selector Anime / Manga */
+        .type-toggle {
+            display: flex; background: var(--input-bg); border-radius: 10px; padding: 5px; margin-bottom: 25px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .type-toggle label {
+            flex: 1; text-align: center; padding: 10px; font-weight: 800; font-size: 0.85rem;
+            text-transform: uppercase; letter-spacing: 1px; cursor: pointer; border-radius: 6px;
+            color: var(--text-muted); transition: all 0.3s; margin: 0;
+        }
+        .type-toggle input { display: none; }
+        .type-toggle input:checked + span { color: #fff; }
+        .type-toggle label:has(input:checked) { background: var(--primary); box-shadow: 0 4px 15px rgba(104, 61, 156, 0.4); }
+
+        .form-group { margin-bottom: 18px; }
+        .form-row { display: flex; gap: 15px; }
+
+        .input-label {
+            display: block; margin-bottom: 8px; font-size: 0.75rem;
+            color: var(--text-muted); font-weight: 800; text-transform: uppercase; letter-spacing: 1px;
+        }
+
+        input[type="text"], input[type="number"], select {
+            width: 100%; padding: 12px 14px; border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 8px; background: var(--input-bg); color: white;
+            font-family: 'Outfit', sans-serif; font-size: 0.95rem; font-weight: 500;
+            transition: all 0.3s;
+        }
+        input:focus, select:focus { outline: none; border-color: var(--primary); background: #222228; box-shadow: 0 0 0 3px rgba(104, 61, 156, 0.2); }
+
+        .btn {
+            width: 100%; padding: 12px; border: none; border-radius: 8px;
+            font-size: 0.9rem; font-weight: 800; font-family: 'Outfit', sans-serif;
+            cursor: pointer; transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 1px;
+        }
+
+        .upload-row { display: flex; gap: 10px; margin-bottom: 20px; }
+        .btn-upload { background: #27272a; color: white; flex: 1; font-size: 0.8rem; padding: 10px; }
+        .btn-upload:hover { background: #3f3f46; }
+
+        .btn-export {
+            background: var(--primary); color: white; margin-top: 10px; padding: 16px; font-size: 1rem;
+            box-shadow: 0 10px 30px rgba(104, 61, 156, 0.4);
+        }
+        .btn-export:hover { transform: translateY(-3px); filter: brightness(1.2); box-shadow: 0 15px 35px rgba(104, 61, 156, 0.6); }
+
+        .cropper-container-wrapper {
+            display: none; margin-bottom: 20px; border-radius: 8px; overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1); max-height: 250px;
+        }
+        .btn-apply-crop { background: #4ac649; color: white; margin-bottom: 20px; display: none; }
+
+        /* === PREVIEW WEB === */
+        .preview-wrapper { width: 100%; max-width: 950px; display: flex; justify-content: center; align-items: flex-start; }
+
+        .card {
+            position: relative; background-color: var(--card-bg-color); border-radius: 20px;
+            overflow: hidden; box-shadow: 0 40px 80px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.1);
+            aspect-ratio: 16 / 9; width: 100%; 
+            /* Variable CSS Dinámica para todo el componente */
+            --score-color: #683d9c; 
+        }
+
+        .card-bg-container { position: absolute; inset: 0; z-index: 1; overflow: hidden; }
+        .card-bg-blur { position: absolute; inset: -10%; background-size: cover; background-position: center; filter: blur(25px); opacity: 0.5; }
+        .card-bg-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(11,11,14,0.85) 0%, rgba(11,11,14,1) 100%); }
+        
+        /* Efecto de Luz Ambiental dinámica */
+        .ambient-glow {
+            position: absolute; right: -10%; bottom: -20%; width: 50%; aspect-ratio: 1;
+            border-radius: 50%; background: var(--score-color); filter: blur(120px); opacity: 0.2; z-index: 1;
+        }
+
+        .card-header { position: absolute; top: 0; left: 0; right: 0; height: 46%; background-size: cover; background-position: center; z-index: 2; }
+        .header-fade { position: absolute; bottom: 0; left: 0; right: 0; height: 35%; background: linear-gradient(to bottom, transparent 0%, var(--card-bg-color) 100%); }
+        
+        .color-line {
+            position: absolute; bottom: 0; left: 0; right: 0; height: 3px; z-index: 4;
+            background-color: var(--score-color);
+            box-shadow: 0 -2px 15px var(--score-color); 
+        }
+
+        .card-content {
+            position: absolute; top: 46%; left: 0; right: 0; bottom: 0; z-index: 3;
+            padding: 4% 6%; display: flex; justify-content: space-between; align-items: flex-start;
+        }
+
+        .info-layout { display: flex; flex-direction: column; gap: 15px; width: 75%; }
+
+        .title-val {
+            font-size: 2.8rem; font-weight: 900; color: #ffffff; line-height: 1.1;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 95%;
+            letter-spacing: -1px; text-shadow: 2px 2px 10px rgba(0,0,0,0.9); margin-bottom: 5px;
+        }
+
+        .stats-grid { display: grid; grid-template-columns: 1fr 1.2fr 1.5fr; gap: 18px 30px; transition: all 0.3s; }
+        .col-group { display: flex; flex-direction: column; gap: 18px; }
+        
+        .stat-item { display: flex; flex-direction: column; gap: 6px; }
+        
+        /* Acentos Dinámicos (Led) en las etiquetas */
+        .stat-label { font-size: 0.75rem; color: #8b8b99; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; line-height: 1; }
+        .stat-label::before {
+            content: ''; display: inline-block; width: 7px; height: 7px; border-radius: 50%;
+            background-color: var(--score-color); margin-right: 8px; vertical-align: middle;
+            box-shadow: 0 0 8px var(--score-color); transform: translateY(-2px);
+        }
+
+        .stat-value { font-size: 1.35rem; color: #f8f8f8; font-weight: 600; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 250px; }
+
+        .season-badge {
+            display: inline-flex; align-items: center; justify-content: center;
+            padding: 6px 14px; border-radius: 8px; font-weight: 800; font-size: 1rem;
+            letter-spacing: 1px; line-height: 1.2; width: fit-content;
+        }
+
+        .char-item { display: flex; flex-direction: column; gap: 12px; justify-content: flex-start; }
+        .char-content { display: flex; align-items: center; gap: 15px; }
+        .char-avatar {
+            width: 75px; height: 75px; border-radius: 50%; background-color: #222; flex-shrink: 0;
+            background-size: cover; background-position: center; border: 3px solid var(--score-color);
+            box-shadow: 0 0 15px var(--score-color);
+        }
+        .char-name { font-size: 1.3rem; font-weight: 700; color: #fff; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px; }
+
+        .score-wrapper {
+            position: relative; width: 20%; aspect-ratio: 1/1; display: flex; justify-content: center; align-items: center;
+            background: rgba(0,0,0,0.7); border-radius: 50%; flex-shrink: 0; box-shadow: inset 0 0 30px rgba(0,0,0,0.9);
+            margin-top: 1%; 
+        }
+        .ring-track { position: absolute; inset: 0; border-radius: 50%; border: 7px solid rgba(255,255,255,0.05); }
+        .static-ring {
+            position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(var(--score-color) 90%, transparent 0);
+            -webkit-mask: radial-gradient(closest-side, transparent 86%, black 88%);
+            mask: radial-gradient(closest-side, transparent 86%, black 88%);
+        }
+        .score-text { position: relative; font-size: 3.8rem; font-weight: 900; color: #ffffff; line-height: 1; z-index: 10; text-shadow: 0 0 20px var(--score-color), 2px 2px 5px rgba(0,0,0,0.9); }
+
+        /* Icono Dinámico */
+        .media-icon {
+            position: absolute; bottom: 25px; left: 55px; width: 28px; height: 28px;
+            color: var(--score-color); filter: drop-shadow(0 0 10px var(--score-color)); z-index: 5;
+        }
+        .media-icon svg { width: 100%; height: 100%; fill: currentColor; }
+
+        .watermark {
+            position: absolute; bottom: 15px; left: 0; right: 0; text-align: center;
+            font-size: 0.75rem; color: rgba(255,255,255,0.3); font-weight: 500; letter-spacing: 1px; z-index: 5;
+        }
+
+        #loadingOverlay {
+            display: none; position: fixed; inset: 0; background: rgba(5,5,5,0.95);
+            z-index: 9999; justify-content: center; align-items: center; flex-direction: column;
+            color: white; font-weight: 800; font-size: 1.4rem; backdrop-filter: blur(15px);
+        }
+        .spinner { width: 60px; height: 60px; border: 6px solid rgba(255,255,255,0.1); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 25px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div id="loadingOverlay">
+        <div class="spinner"></div>
+        <div id="loadingText">Renderizando Motor FULL HD (1920x1080)...</div>
+    </div>
+
+    <div class="app-layout">
+        <div class="controls-panel">
+            <h2>Media Stats</h2>
+            
+            <div class="type-toggle">
+                <label>
+                    <input type="radio" name="mediaType" value="anime" checked onchange="toggleMode()">
+                    <span>Anime</span>
+                </label>
+                <label>
+                    <input type="radio" name="mediaType" value="manga" onchange="toggleMode()">
+                    <span>Manga</span>
+                </label>
+            </div>
+
+            <div class="upload-row">
+                <button class="btn btn-upload" onclick="triggerUpload('banner')">🖼️ Portada / Banner</button>
+                <button class="btn btn-upload" id="charBtn" onclick="triggerUpload('character')">👤 Personaje Fav</button>
+            </div>
+            
+            <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="loadImage(event)">
+            
+            <div class="cropper-container-wrapper" id="cropperWrapper">
+                <img id="imageToCrop" src="" style="max-width: 100%;">
+            </div>
+            <button class="btn btn-apply-crop" id="btnApplyCrop" onclick="applyCrop()">✂️ Confirmar Recorte</button>
+
+            <div class="form-group">
+                <span class="input-label">Título de la Obra</span>
+                <input type="text" id="inputTitle" value="Sousou no Frieren" oninput="updatePreview()">
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group" style="flex: 1;">
+                    <span class="input-label" id="labelEpisodes">Episodios</span>
+                    <input type="text" id="inputEpisodes" value="28" oninput="updatePreview()">
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <span class="input-label">Nota (1-10)</span>
+                    <input type="number" id="inputScore" value="9" min="1" max="10" step="0.1" oninput="updatePreview()">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group" style="flex: 1;">
+                    <span class="input-label" id="labelStudio">Estudio</span>
+                    <input type="text" id="inputStudio" value="Madhouse" oninput="updatePreview()">
+                </div>
+                <div class="form-group" style="flex: 1;" id="charGroup">
+                    <span class="input-label">Fav Character</span>
+                    <input type="text" id="inputCharacter" value="Stark" oninput="updatePreview()">
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group" style="flex: 1;">
+                    <span class="input-label" id="labelSeason">Temporada / Año</span>
+                    
+                    <div id="animeSeasonInputs" style="display: flex; gap: 10px;">
+                        <select id="inputSeason" oninput="updatePreview()">
+                            <option value="WINTER">Winter</option>
+                            <option value="SPRING">Spring</option>
+                            <option value="SUMMER">Summer</option>
+                            <option value="FALL" selected>Fall</option>
+                        </select>
+                        <input type="number" id="inputYear" value="2023" style="width: 80px;" oninput="updatePreview()">
+                    </div>
+                    
+                    <input type="text" id="inputArt" value="Tsukasa Abe" style="display: none;" oninput="updatePreview()">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <span class="input-label" id="labelWatched">Fechas completado</span>
+                <input type="text" id="inputWatched" value="10/10/23 - 22/03/24" oninput="updatePreview()">
+            </div>
+
+            <button class="btn btn-export" id="btnExport" onclick="exportToPng()">
+                🚀 Exportar Tarjeta (1080p)
+            </button>
+        </div>
+
+        <div class="preview-wrapper">
+            <div class="card" id="previewCard">
+                <div class="card-bg-container">
+                    <div class="card-bg-blur preview-bg"></div>
+                    <div class="ambient-glow"></div>
+                    <div class="card-bg-overlay"></div>
+                </div>
+                
+                <div class="card-header preview-header">
+                    <div class="header-fade"></div>
+                    <div class="color-line" id="colorLine"></div>
+                </div>
+                
+                <div class="card-content">
+                    <div class="info-layout">
+                        <span class="title-val preview-title">Sousou no Frieren</span>
+                        <div class="stats-grid" id="statsGrid">
+                            
+                            <div class="col-group">
+                                <div class="stat-item">
+                                    <span class="stat-label" id="outLabelEpisodes">EPISODES</span>
+                                    <span class="stat-value preview-episodes">28</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label" id="outLabelSeason">SEASON</span>
+                                    <span class="season-badge preview-season" id="outSeasonVal">FALL 2023</span>
+                                </div>
+                            </div>
+
+                            <div class="col-group">
+                                <div class="stat-item">
+                                    <span class="stat-label" id="outLabelStudio">STUDIO</span>
+                                    <span class="stat-value preview-studio">Madhouse</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label" id="outLabelWatched">WATCHED</span>
+                                    <span class="stat-value preview-watched">10/10/23 - 22/03/24</span>
+                                </div>
+                            </div>
+
+                            <div class="col-group preview-char-item" id="outCharGroup">
+                                <div class="char-item">
+                                    <span class="stat-label">FAV CHARACTER</span>
+                                    <div class="char-content">
+                                        <div class="char-avatar" id="previewAvatar"></div>
+                                        <span class="char-name preview-char-name">Stark</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="score-wrapper">
+                        <div class="ring-track" id="ringTrack"></div>
+                        <div class="static-ring" id="staticRing"></div>
+                        <div class="score-text" id="outScore">9</div>
+                    </div>
+                </div>
+
+                <!-- Icono TV / Book -->
+                <div class="media-icon" id="mediaIcon"></div>
+                
+                <div class="watermark">Template and tool made by @Franchowo</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const scoreColors = {
+            1: { hex: '#be332c', rgba: 'rgba(190, 51, 44, 0.2)' },
+            2: { hex: '#f3322a', rgba: 'rgba(243, 50, 42, 0.2)' },
+            3: { hex: '#fe6d01', rgba: 'rgba(254, 109, 1, 0.2)' },
+            4: { hex: '#fc9a01', rgba: 'rgba(252, 154, 1, 0.2)' },
+            5: { hex: '#fce532', rgba: 'rgba(252, 229, 50, 0.2)' },
+            6: { hex: '#aee432', rgba: 'rgba(174, 228, 50, 0.2)' },
+            7: { hex: '#4ac649', rgba: 'rgba(74, 198, 73, 0.2)' },
+            8: { hex: '#4cbeb9', rgba: 'rgba(76, 190, 185, 0.2)' },
+            9: { hex: '#697a9a', rgba: 'rgba(105, 122, 154, 0.2)' },
+            10:{ hex: '#683d9c', rgba: 'rgba(104, 61, 156, 0.2)' }
+        };
+        const seasonColors = { 'WINTER': '#4dd2ff', 'SPRING': '#ff80df', 'SUMMER': '#ffcc00', 'FALL': '#4ac649' };
+
+        const iconPaths = {
+            anime: "M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z",
+            manga: "M21 5c-1.11-.35-2.33-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1zM21 18.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V8c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5v11.5z"
+        };
+
+        let cropper;
+        let cropTarget = ''; 
+        let currentMode = 'anime'; 
+        
+        let originalImageObj = new Image(); 
+        let croppedBannerObj = new Image();  
+        let croppedCharObj = new Image();
+
+        document.querySelector('.preview-bg').style.backgroundColor = '#121214';
+        document.querySelector('.preview-header').style.backgroundColor = '#1a1a1e';
+
+        function toggleMode() {
+            currentMode = document.querySelector('input[name="mediaType"]:checked').value;
+            
+            const charGroup = document.getElementById('charGroup');
+            const charBtn = document.getElementById('charBtn');
+            const animeSeasonInputs = document.getElementById('animeSeasonInputs');
+            const inputArt = document.getElementById('inputArt');
+            
+            const epLabel = document.getElementById('labelEpisodes');
+            const studioLabel = document.getElementById('labelStudio');
+            const seasonLabel = document.getElementById('labelSeason');
+            const watchedLabel = document.getElementById('labelWatched');
+            
+            const outCharGroup = document.getElementById('outCharGroup');
+            const outLabelEpisodes = document.getElementById('outLabelEpisodes');
+            const outLabelStudio = document.getElementById('outLabelStudio');
+            const outLabelSeason = document.getElementById('outLabelSeason');
+            const outLabelWatched = document.getElementById('outLabelWatched');
+            const statsGrid = document.getElementById('statsGrid');
+            
+            if (currentMode === 'anime') {
+                charGroup.style.display = 'block'; charBtn.style.display = 'block';
+                outCharGroup.style.display = 'flex'; animeSeasonInputs.style.display = 'flex';
+                inputArt.style.display = 'none';
+                
+                epLabel.innerText = 'Episodios'; studioLabel.innerText = 'Estudio';
+                seasonLabel.innerText = 'Temporada / Año'; watchedLabel.innerText = 'Fechas completado';
+                
+                outLabelEpisodes.innerText = 'EPISODES'; outLabelStudio.innerText = 'STUDIO';
+                outLabelSeason.innerText = 'SEASON'; outLabelWatched.innerText = 'WATCHED';
+                
+                statsGrid.style.gridTemplateColumns = '1fr 1.2fr 1.5fr'; 
+                document.querySelector('.type-toggle label:has(input:checked)').style.background = '#683d9c';
+            } else {
+                charGroup.style.display = 'none'; charBtn.style.display = 'none';
+                outCharGroup.style.display = 'none'; animeSeasonInputs.style.display = 'none';
+                inputArt.style.display = 'block';
+                
+                epLabel.innerText = 'Capítulos / Tomos'; studioLabel.innerText = 'Historia (Story)';
+                seasonLabel.innerText = 'Arte (Art)'; watchedLabel.innerText = 'Fechas de lectura';
+                
+                outLabelEpisodes.innerText = 'CHAPTERS'; outLabelStudio.innerText = 'STORY';
+                outLabelSeason.innerText = 'ART'; outLabelWatched.innerText = 'READ';
+                
+                statsGrid.style.gridTemplateColumns = '1fr 1fr'; 
+                document.querySelector('.type-toggle label:has(input:checked)').style.background = '#4cbeb9';
+            }
+
+            document.getElementById('mediaIcon').innerHTML = `<svg viewBox="0 0 24 24"><path d="${iconPaths[currentMode]}"></path></svg>`;
+            updatePreview();
+        }
+
+        function triggerUpload(target) {
+            cropTarget = target;
+            document.getElementById('fileInput').click();
+        }
+
+        function loadImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const imageElement = document.getElementById('imageToCrop');
+                imageElement.src = e.target.result;
+                
+                if(cropTarget === 'banner') {
+                    originalImageObj.src = e.target.result;
+                    document.querySelector('.preview-bg').style.backgroundImage = `url('${e.target.result}')`;
+                }
+
+                document.getElementById('cropperWrapper').style.display = 'block';
+                document.getElementById('btnApplyCrop').style.display = 'block';
+
+                if(cropper) { cropper.destroy(); }
+                const ratio = cropTarget === 'banner' ? (1920 / 500) : 1; 
+                cropper = new Cropper(imageElement, { viewMode: 1, dragMode: 'move', aspectRatio: ratio, autoCropArea: 1, background: false });
+            };
+            reader.readAsDataURL(file);
+            event.target.value = ''; 
+        }
+
+        function applyCrop() {
+            if (!cropper) return;
+            const size = cropTarget === 'banner' ? 1920 : 400; 
+            const canvas = cropper.getCroppedCanvas({ width: size }); 
+            const croppedBase64 = canvas.toDataURL('image/jpeg', 1.0);
+            
+            if(cropTarget === 'banner') {
+                croppedBannerObj.src = croppedBase64;
+                document.querySelector('.preview-header').style.backgroundImage = `url('${croppedBase64}')`;
+            } else {
+                croppedCharObj.src = croppedBase64;
+                document.getElementById('previewAvatar').style.backgroundImage = `url('${croppedBase64}')`;
+            }
+            
+            document.getElementById('cropperWrapper').style.display = 'none';
+            document.getElementById('btnApplyCrop').style.display = 'none';
+        }
+
+        function updatePreview() {
+            let scoreStr = document.getElementById('inputScore').value;
+            let score = Math.round(parseFloat(scoreStr)) || 10;
+            if(score < 1) score = 1; if(score > 10) score = 10;
+
+            document.querySelector('.preview-title').textContent = document.getElementById('inputTitle').value;
+            document.querySelector('.preview-episodes').textContent = document.getElementById('inputEpisodes').value;
+            document.querySelector('.preview-studio').textContent = document.getElementById('inputStudio').value;
+            document.querySelector('.preview-watched').textContent = document.getElementById('inputWatched').value;
+            document.getElementById('outScore').textContent = scoreStr;
+
+            const seasonBadge = document.getElementById('outSeasonVal');
+            
+            if (currentMode === 'anime') {
+                const season = document.getElementById('inputSeason').value;
+                const year = document.getElementById('inputYear').value;
+                document.querySelector('.preview-char-name').textContent = document.getElementById('inputCharacter').value;
+                
+                seasonBadge.textContent = `${season} ${year}`;
+                seasonBadge.className = 'season-badge preview-season';
+                const sColor = seasonColors[season];
+                seasonBadge.style.color = sColor;
+                seasonBadge.style.border = `2px solid ${sColor}`;
+                seasonBadge.style.backgroundColor = `${sColor}15`;
+                seasonBadge.style.boxShadow = `0 4px 15px ${sColor}20`; 
+            } else {
+                seasonBadge.textContent = document.getElementById('inputArt').value;
+                seasonBadge.className = 'stat-value preview-season';
+                seasonBadge.style = ''; 
+            }
+
+            const colors = scoreColors[score];
+            // Inyectar Color Theme a todo el componente para los brillos ambientales y de iconos
+            document.getElementById('previewCard').style.setProperty('--score-color', colors.hex);
+
+            document.getElementById('ringTrack').style.borderColor = colors.rgba;
+            
+            const realScoreNum = parseFloat(scoreStr) || 10;
+            let percentage = (realScoreNum / 10) * 100;
+            if(percentage > 100) percentage = 100;
+            document.getElementById('staticRing').style.background = `conic-gradient(${colors.hex} ${percentage}%, transparent 0)`;
+            
+            const btnExport = document.getElementById('btnExport');
+            btnExport.style.background = colors.hex;
+            btnExport.style.boxShadow = `0 10px 25px ${colors.rgba}`;
+            document.querySelector('.type-toggle label:has(input:checked)').style.background = colors.hex;
+            document.querySelector('.type-toggle label:has(input:checked)').style.boxShadow = `0 4px 15px ${colors.rgba}`;
+        }
+
+        /* =========================================================
+           🚀 NATIVE CANVAS ENGINE - 1920x1080 FULL HD
+           ========================================================= */
+        async function exportToPng() {
+            const btn = document.getElementById('btnExport');
+            const loading = document.getElementById('loadingOverlay');
+            btn.disabled = true; loading.style.display = 'flex';
+
+            await document.fonts.ready;
+
+            const title = document.getElementById('inputTitle').value;
+            const episodes = document.getElementById('inputEpisodes').value;
+            const studio = document.getElementById('inputStudio').value; 
+            const watched = document.getElementById('inputWatched').value;
+            const scoreStr = document.getElementById('inputScore').value;
+            
+            let score = Math.round(parseFloat(scoreStr)) || 10;
+            if(score < 1) score = 1; if(score > 10) score = 10;
+            const colors = scoreColors[score];
+
+            const finalWidth = 1920;
+            const finalHeight = 1080;
+            const canvas = document.createElement('canvas');
+            canvas.width = finalWidth; canvas.height = finalHeight;
+            const ctx = canvas.getContext('2d');
+
+            // Función Helper para dibujar Etiquetas con Acento LED
+            function drawLabel(text, x, y) {
+                ctx.fillStyle = colors.hex;
+                ctx.shadowColor = colors.hex; ctx.shadowBlur = 12;
+                ctx.beginPath(); ctx.arc(x - 22, y + 15, 6, 0, Math.PI * 2); ctx.fill(); // Punto LED
+                ctx.shadowColor = "transparent"; ctx.shadowBlur = 0;
+                ctx.fillStyle = '#8b8b99';
+                ctx.fillText(text, x, y); // Texto etiqueta
+            }
+
+            // 1. BORDES REDONDEADOS GLOBALES
+            const radiusRounded = 48;
+            ctx.beginPath();
+            ctx.moveTo(radiusRounded, 0); ctx.lineTo(finalWidth - radiusRounded, 0); ctx.quadraticCurveTo(finalWidth, 0, finalWidth, radiusRounded);
+            ctx.lineTo(finalWidth, finalHeight - radiusRounded); ctx.quadraticCurveTo(finalWidth, finalHeight, finalWidth - radiusRounded, finalHeight);
+            ctx.lineTo(radiusRounded, finalHeight); ctx.quadraticCurveTo(0, finalHeight, 0, finalHeight - radiusRounded);
+            ctx.lineTo(0, radiusRounded); ctx.quadraticCurveTo(0, 0, radiusRounded, 0); ctx.closePath(); ctx.clip(); 
+
+            ctx.fillStyle = "#0b0b0e"; ctx.fillRect(0, 0, finalWidth, finalHeight);
+
+            // 2. FONDO GLOBAL DIFUMINADO
+            if (originalImageObj.src) {
+                ctx.save(); ctx.filter = 'blur(25px)';
+                const scale = Math.max(finalWidth / originalImageObj.width, finalHeight / originalImageObj.height);
+                const x = (finalWidth / 2) - (originalImageObj.width / 2) * scale;
+                const y = (finalHeight / 2) - (originalImageObj.height / 2) * scale;
+                ctx.drawImage(originalImageObj, x - 50, y - 50, originalImageObj.width * scale + 100, originalImageObj.height * scale + 100);
+                ctx.restore();
+            }
+
+            const bgGradient = ctx.createLinearGradient(0, 0, 0, finalHeight);
+            bgGradient.addColorStop(0, "rgba(11,11,14,0.85)"); 
+            bgGradient.addColorStop(1, "rgba(11,11,14,1)");
+            ctx.fillStyle = bgGradient; ctx.fillRect(0, 0, finalWidth, finalHeight);
+
+            // Luz Ambiental Radial (Ambient Glow)
+            const circleRadius = 150; 
+            const circleCenterX = finalWidth - 120 - circleRadius; 
+            const circleCenterY = 500 + ((finalHeight - 500) / 2);
+            
+            const glowGradient = ctx.createRadialGradient(circleCenterX, circleCenterY, 0, circleCenterX, circleCenterY, 700);
+            glowGradient.addColorStop(0, colors.hex + "30"); // 18% opacidad aproximada
+            glowGradient.addColorStop(1, "transparent");
+            ctx.fillStyle = glowGradient;
+            ctx.fillRect(0, 0, finalWidth, finalHeight);
+
+            // 3. CABECERA NÍTIDA
+            const headerHeight = 500;
+            if (croppedBannerObj.src) { ctx.drawImage(croppedBannerObj, 0, 0, finalWidth, headerHeight); }
+
+            const headerFade = ctx.createLinearGradient(0, headerHeight - 180, 0, headerHeight);
+            headerFade.addColorStop(0, "transparent"); headerFade.addColorStop(1, "#0b0b0e");
+            ctx.fillStyle = headerFade; ctx.fillRect(0, headerHeight - 180, finalWidth, 180);
+
+            // Línea Dinámica Color Puntuación
+            ctx.fillStyle = colors.hex;
+            ctx.shadowColor = colors.hex; ctx.shadowBlur = 15;
+            ctx.fillRect(0, headerHeight - 4, finalWidth, 4); 
+            ctx.shadowColor = "transparent"; ctx.shadowBlur = 0;
+
+            // 4. TEXTOS HD Y GRID
+            const paddingX = 140; // Incrementado ligeramente para los LEDS
+            const startY = headerHeight + 70;
+            
+            ctx.font = '900 96px Outfit, sans-serif'; ctx.fillStyle = '#ffffff';
+            ctx.shadowColor = "rgba(0,0,0,0.9)"; ctx.shadowBlur = 15; ctx.shadowOffsetX = 3; ctx.shadowOffsetY = 3;
+            ctx.textAlign = "left"; ctx.textBaseline = "top"; 
+            ctx.fillText(title, paddingX - 25, startY, 1300); // Alineado con el título
+            ctx.shadowColor = "transparent"; ctx.shadowBlur = 0; ctx.shadowOffsetX = 0; ctx.shadowOffsetY = 0;
+
+            const gridY = startY + 135; 
+            const col2X = currentMode === 'anime' ? 570 : 770; 
+            const col3X = 1050; 
+            const row2Y = gridY + 135; 
+
+            // -- Fila 1 --
+            ctx.font = '800 26px Outfit, sans-serif';
+            drawLabel(currentMode === 'anime' ? "EPISODES" : "CHAPTERS", paddingX, gridY);
+            drawLabel(currentMode === 'anime' ? "STUDIO" : "STORY", col2X, gridY);
+            if (currentMode === 'anime') drawLabel("FAV CHARACTER", col3X, gridY); 
+
+            ctx.font = '600 48px Outfit, sans-serif'; ctx.fillStyle = '#f8f8f8';
+            ctx.fillText(episodes, paddingX, gridY + 45, 380); 
+            ctx.fillText(studio, col2X, gridY + 45, currentMode === 'anime' ? 450 : 700); 
+
+            // -- Personaje Fav (Solo Anime) --
+            if (currentMode === 'anime') {
+                const character = document.getElementById('inputCharacter').value;
+                const avatarRadius = 55;
+                const avatarX = col3X + avatarRadius - 10;
+                const avatarY = gridY + 95; 
+
+                if (croppedCharObj.src) {
+                    ctx.save();
+                    ctx.beginPath(); ctx.arc(avatarX, avatarY, avatarRadius, 0, Math.PI * 2); ctx.closePath(); ctx.clip();
+                    ctx.drawImage(croppedCharObj, avatarX - avatarRadius, avatarY - avatarRadius, avatarRadius*2, avatarRadius*2);
+                    ctx.restore();
+                } else {
+                    ctx.beginPath(); ctx.arc(avatarX, avatarY, avatarRadius, 0, Math.PI * 2);
+                    ctx.fillStyle = '#222'; ctx.fill();
+                }
+                
+                ctx.beginPath(); ctx.arc(avatarX, avatarY, avatarRadius, 0, Math.PI * 2);
+                ctx.lineWidth = 6; ctx.strokeStyle = colors.hex; ctx.shadowColor = colors.hex; ctx.shadowBlur = 15; ctx.stroke(); 
+                ctx.shadowColor = "transparent"; ctx.shadowBlur = 0;
+                
+                ctx.beginPath(); ctx.arc(avatarX, avatarY, avatarRadius + 3, 0, Math.PI * 2);
+                ctx.lineWidth = 2; ctx.strokeStyle = "rgba(0,0,0,0.5)"; ctx.stroke();
+
+                ctx.font = '700 46px Outfit, sans-serif'; ctx.fillStyle = '#ffffff';
+                ctx.textBaseline = "middle";
+                ctx.fillText(character, avatarX + avatarRadius + 25, avatarY, 320); 
+                ctx.textBaseline = "top"; 
+            }
+
+            // -- Fila 2 --
+            ctx.font = '800 26px Outfit, sans-serif';
+            drawLabel(currentMode === 'anime' ? "SEASON" : "ART", paddingX, row2Y);
+            drawLabel(currentMode === 'anime' ? "WATCHED" : "READ", col2X, row2Y);
+
+            ctx.font = '600 48px Outfit, sans-serif'; ctx.fillStyle = '#f8f8f8';
+            ctx.fillText(watched, col2X, row2Y + 45, 450);
+
+            if (currentMode === 'anime') {
+                const season = document.getElementById('inputSeason').value;
+                const year = document.getElementById('inputYear').value;
+                const sColor = seasonColors[season];
+                const seasonText = `${season} ${year}`;
+                
+                ctx.font = '800 36px Outfit, sans-serif';
+                const badgeWidth = ctx.measureText(seasonText).width + 50; 
+                const badgeHeight = 60;
+                const badgeY = row2Y + 35;
+                
+                ctx.globalAlpha = 0.15; ctx.fillStyle = sColor;
+                ctx.beginPath(); ctx.roundRect(paddingX, badgeY, badgeWidth, badgeHeight, 14); ctx.fill();
+                ctx.globalAlpha = 1.0;
+
+                ctx.strokeStyle = sColor; ctx.lineWidth = 3;
+                ctx.beginPath(); ctx.roundRect(paddingX, badgeY, badgeWidth, badgeHeight, 14); ctx.stroke();
+                
+                ctx.fillStyle = sColor; ctx.textBaseline = "middle";
+                ctx.fillText(seasonText, paddingX + 25, badgeY + (badgeHeight/2) + 3);
+                ctx.textBaseline = "top";
+            } else {
+                const art = document.getElementById('inputArt').value;
+                ctx.font = '600 48px Outfit, sans-serif'; ctx.fillStyle = '#f8f8f8';
+                ctx.fillText(art, paddingX, row2Y + 45, 450);
+            }
+
+            // 5. CÍRCULO PUNTUACIÓN
+            const circleLineWidth = 22;
+
+            ctx.beginPath(); ctx.arc(circleCenterX, circleCenterY, circleRadius + 20, 0, 2 * Math.PI);
+            ctx.fillStyle = "rgba(0,0,0,0.7)"; ctx.shadowColor = "rgba(0,0,0,0.9)"; ctx.shadowBlur = 40; ctx.fill();
+            ctx.shadowColor = "transparent";
+
+            ctx.beginPath(); ctx.arc(circleCenterX, circleCenterY, circleRadius, 0, 2 * Math.PI);
+            ctx.lineWidth = circleLineWidth; ctx.strokeStyle = colors.rgba; ctx.stroke();
+
+            const realScoreNum = parseFloat(scoreStr) || 10;
+            let fillPercentage = realScoreNum / 10;
+            if(fillPercentage > 1) fillPercentage = 1;
+            
+            const arcLength = fillPercentage * (Math.PI * 2);
+            const startAngle = -Math.PI / 2; 
+            const endAngle = startAngle + arcLength;
+            
+            if(realScoreNum > 0) {
+                ctx.beginPath(); ctx.arc(circleCenterX, circleCenterY, circleRadius, startAngle, endAngle);
+                ctx.lineWidth = circleLineWidth; ctx.lineCap = "round"; ctx.strokeStyle = colors.hex; ctx.stroke();
+            }
+
+            let fontSize = scoreStr.length > 2 ? 100 : 130;
+            ctx.font = `900 ${fontSize}px Outfit, sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#ffffff';
+            ctx.shadowColor = "rgba(0,0,0,0.9)"; ctx.shadowBlur = 15; ctx.fillText(scoreStr, circleCenterX, circleCenterY + 8);
+            ctx.shadowColor = colors.hex; ctx.shadowBlur = 40; ctx.fillText(scoreStr, circleCenterX, circleCenterY + 8);
+
+            // 6. ICONO NATIVO (TV/LIBRO)
+            ctx.save();
+            ctx.translate(paddingX - 25, finalHeight - 80); 
+            ctx.scale(2.5, 2.5);
+            ctx.fillStyle = colors.hex;
+            ctx.shadowColor = colors.hex; ctx.shadowBlur = 15;
+            ctx.fill(new Path2D(iconPaths[currentMode]));
+            ctx.restore();
+
+            // 7. WATERMARK (Firma)
+            ctx.shadowColor = "transparent"; ctx.shadowBlur = 0;
+            ctx.font = '500 20px Outfit, sans-serif';
+            ctx.fillStyle = 'rgba(255,255,255,0.2)';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'bottom';
+            ctx.fillText("Template and tool made by @Franchowo", finalWidth / 2, finalHeight - 30);
+
+            // 8. DESCARGAR
+            const dataUrl = canvas.toDataURL('image/png', 1.0);
+            const link = document.createElement('a');
+            const mediaTypeStr = currentMode === 'anime' ? 'AnimeStats' : 'MangaStats';
+            link.download = `${mediaTypeStr}_HD_${title.replace(/\s+/g, '_')}.png`;
+            link.href = dataUrl; link.click();
+
+            loading.style.display = 'none'; btn.disabled = false;
+        }
+
+        toggleMode();
+    </script>
+</body>
+</html>

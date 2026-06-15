@@ -1,0 +1,17 @@
+{
+  "name": "Media Stats Pro",
+  "short_name": "MediaStats",
+  "description": "Generador de tarjetas para Anime y Manga de alta calidad.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#683d9c",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
